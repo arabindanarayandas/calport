@@ -52,3 +52,14 @@ export function errorCode(e: unknown): string {
 }
 export const message = (code?: string | null) =>
   code ? MESSAGES[code] ?? "Something went wrong. Please try again." : null;
+
+/** yyyy-mm-dd in India time — for grouping by day. */
+export const dayKey = (iso: string) => new Date(new Date(iso).getTime() + 5.5 * 3600e3).toISOString().slice(0, 10);
+
+/** "Today", "Tomorrow", or "Sat, 7 Nov". */
+export function relDay(iso: string) {
+  const k = dayKey(iso);
+  const today = dayKey(new Date().toISOString());
+  const tomorrow = dayKey(new Date(Date.now() + 86400e3).toISOString());
+  return k === today ? "Today" : k === tomorrow ? "Tomorrow" : day(iso);
+}

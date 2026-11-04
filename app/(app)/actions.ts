@@ -74,7 +74,7 @@ export async function submitScorecard(form: FormData) {
   const { sb } = await requireMe({ role: "mentor" });
   const id = String(form.get("session_id"));
   const skills = form.getAll("skill").map((name, i) => ({
-    skill: String(name), score: Number(form.getAll("score")[i]), note: String(form.getAll("note")[i] ?? ""),
+    skill: String(name), score: Number(form.get(`score-${name}`)), note: String(form.getAll("note")[i] ?? ""),
   }));
   const { error } = await sb.rpc("submit_scorecard", {
     p_session: id, p_skills: skills,

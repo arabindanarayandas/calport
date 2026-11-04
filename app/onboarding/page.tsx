@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { requireMe } from "@/lib/me";
-import { Alert } from "@/components/Shell";
+import { Alert } from "@/components/ui";
 import { LearnerForm, MentorForm } from "@/components/ProfileForms";
 import { message } from "@/lib/format";
 
@@ -7,20 +8,22 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
   const { profile, mentor } = await requireMe({ allowUnonboarded: true });
   const sp = await searchParams;
   const err = sp.error === "adult" ? "Calport is open to students who are 18 or older for now." : message(sp.error);
+  const isMentor = profile.role === "mentor" && mentor;
   return (
-    <div className="auth" style={{ placeItems: "start center" }}><div style={{ width: "100%", maxWidth: 620, paddingTop: 32 }}>
-      <div className="brand" style={{ padding: "0 0 24px" }}>Calport</div>
-      {profile.role === "mentor" && mentor ? (<>
-        <h1>Set up your mentor profile</h1>
-        <p className="muted">Students see this when they choose who to book. We review every mentor before they go live.</p>
+    <div className="onb">
+      <div className="auth-top"><Link href="/" className="brand" style={{ padding: 0 }}><span className="brand-mark">c</span>Calport</Link>
+        <form action="/auth/signout" method="post"><button className="btn ghost sm">Log out</button></form></div>
+      <div className="onb-inner">
+        <div style={{ padding: "32px 0 24px" }}>
+          <div className="eyebrow">Takes about 2 minutes</div>
+          <h1 className="t-title">{isMentor ? "Set up your mentor profile" : "Tell us about you"}</h1>
+          <p className="muted mt-1">{isMentor ? "We review every mentor before they go live." : "This shapes your path. You can change it any time."}</p>
+        </div>
         <Alert error={err} />
-        <MentorForm p={profile} m={mentor} from="onboarding" />
-      </>) : (<>
-        <h1>Tell us about you</h1>
-        <p className="muted">This shapes your path. You can change it any time.</p>
-        <Alert error={err} />
-        <LearnerForm p={profile} from="onboarding" />
-      </>)}
-    </div></div>
+        <div className="card card-body">
+          {isMentor ? <MentorForm p={profile} m={mentor} from="onboarding" /> : <LearnerForm p={profile} from="onboarding" />}
+        </div>
+      </div>
+    </div>
   );
 }
