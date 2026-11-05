@@ -47,13 +47,32 @@ export function Empty({ icon, title, text, action }: { icon: IconName; title: st
   );
 }
 
-export function Stat({ label, value, suffix, foot }: { label: string; value: React.ReactNode; suffix?: string; foot?: React.ReactNode }) {
+export function Stat({ label, value, suffix, foot, icon, href, meter }: {
+  label: string; value: React.ReactNode; suffix?: string; foot?: React.ReactNode;
+  icon?: IconName; href?: string; meter?: { value: number; max: number };
+}) {
+  const body = (<>
+    {icon && <span className="icon-tile stat-icon"><Icon name={icon} /></span>}
+    {href && <span className="stat-go" aria-hidden="true"><Icon name="arrowRight" size={14} /></span>}
+    <div className="stat-value">{value}{suffix && <span className="stat-suffix">{suffix}</span>}</div>
+    <div className="stat-label">{label}</div>
+    {(meter || foot) && (
+      <div className="stat-foot">
+        {meter && <Meter value={meter.value} max={meter.max} />}
+        {foot && <div className={meter ? "mt-2" : ""}>{foot}</div>}
+      </div>)}
+  </>);
+  return href ? <Link href={href} className="card stat stat-link">{body}</Link> : <div className="card stat">{body}</div>;
+}
+
+/** Small calendar tile: month above day number. */
+export function DateTile({ iso, dark }: { iso: string; dark?: boolean }) {
+  const d = new Date(new Date(iso).getTime() + 5.5 * 3600e3);
+  const month = d.toLocaleString("en-IN", { month: "short", timeZone: "UTC" });
   return (
-    <div className="card stat">
-      <div className="t-label">{label}</div>
-      <div className="t-num">{value}{suffix && <span className="muted" style={{ fontSize: 15, fontWeight: 500, letterSpacing: 0, marginLeft: 4 }}>{suffix}</span>}</div>
-      {foot && <div className="stat-foot">{foot}</div>}
-    </div>
+    <span className={`date-tile${dark ? " dark" : ""}`} aria-hidden="true">
+      <span className="m">{month}</span><span className="d">{d.getUTCDate()}</span>
+    </span>
   );
 }
 

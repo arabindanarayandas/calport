@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireMe } from "@/lib/me";
 import { mySessions } from "@/lib/queries";
 import { inr, relDay, time } from "@/lib/format";
-import { Alert, Avatar, Empty, PageHeader, SectionHead, Stat } from "@/components/ui";
+import { Alert, DateTile, Empty, PageHeader, SectionHead, Stat } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 
 export default async function MentorHome({ searchParams }: { searchParams: Promise<{ welcome?: string }> }) {
@@ -28,20 +28,20 @@ export default async function MentorHome({ searchParams }: { searchParams: Promi
       actions={<Link href="/mentor/availability" className="btn"><Icon name="plus" />Add availability</Link>} />
 
     <div className="cols cols-4">
-      <Stat label="Students mentored" value={students} foot="Shown on your profile" />
-      <Stat label="Sessions done" value={done.length} foot={`${upcoming.length} coming up`} />
-      <Stat label="Free sessions given" value={freeUsed} suffix="/ 2" foot={mentor?.price_inr ? `Then ${inr(mentor.price_inr)} a session` : "You've chosen to stay free"} />
-      <Stat label="Earned" value={inr(earned)} foot={<Link href="/mentor/earnings">See earnings →</Link>} />
+      <Stat icon="users" label="Students mentored" value={students} foot="Shown on your profile" />
+      <Stat icon="calendar" href="/sessions" label="Sessions done" value={done.length} foot={`${upcoming.length} coming up`} />
+      <Stat icon="gift" label="Free sessions given" value={freeUsed} suffix="/ 2" foot={mentor?.price_inr ? `Then ${inr(mentor.price_inr)} a session` : "You've chosen to stay free"} />
+      <Stat icon="wallet" href="/mentor/earnings" label="Earned" value={inr(earned)} foot="Paid out once payments go live" />
     </div>
 
     <section className="section">
       <SectionHead title="Upcoming" action={<Link href="/mentor/availability" className="btn ghost sm flush-r">{openSlots ?? 0} open slots</Link>} />
       {upcoming.length ? <div className="list">{upcoming.slice(0, 5).map((s) => (
-        <div key={s.id} className="list-row">
-          <Avatar name={s.other_name} />
-          <div className="list-main"><div className="title truncate">{s.other_name}</div><div className="sub truncate">{s.topic || s.other_sub}</div></div>
-          <div className="when-col"><span className="strong t-small">{relDay(s.starts_at)}</span><span className="t-small muted tabular">{time(s.starts_at)}</span></div>
-        </div>))}</div>
+        <Link key={s.id} href="/sessions" className="list-row row-link">
+          <DateTile iso={s.starts_at} />
+          <div className="list-main"><div className="title truncate">{s.other_name}</div><div className="sub truncate">{relDay(s.starts_at)}, {time(s.starts_at)}{s.topic ? ` · ${s.topic}` : ""}</div></div>
+          <Icon name="chevronRight" className="faint shrink-0" />
+        </Link>))}</div>
         : <Empty icon="calendar" title="No sessions booked yet" text="Share your profile with juniors to get your first booking." action={{ href: "/mentor/availability", label: "Add availability" }} />}
     </section>
   </>);

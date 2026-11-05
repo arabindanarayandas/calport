@@ -15,9 +15,9 @@ export default async function Earnings() {
   return (<>
     <PageHeader title="Earnings" description="Payouts start once payments go live. Every completed session below is recorded and will be paid." />
     <div className="cols cols-3">
-      <Stat label="Earned so far" value={inr(done.reduce((a, s) => a + s.mentor_payout_inr, 0))} foot={`${done.length} completed paid session${done.length === 1 ? "" : "s"}`} />
-      <Stat label="Paid sessions" value={n} foot="Including upcoming" />
-      <Stat label="Calport fee on your next session" value={`${nextRate}%`} foot={n < 10 ? `${10 - n} more until it drops to 20%` : n < 20 ? `${20 - n} more until it drops to 10%` : "You're on the lowest rate"} />
+      <Stat icon="wallet" label="Earned so far" value={inr(done.reduce((a, s) => a + s.mentor_payout_inr, 0))} foot={`${done.length} completed paid session${done.length === 1 ? "" : "s"}`} />
+      <Stat icon="calendar" label="Paid sessions" value={n} foot="Including upcoming" />
+      <Stat icon="target" label="Calport fee on your next session" value={`${nextRate}%`} foot={n < 10 ? `${10 - n} more until it drops to 20%` : n < 20 ? `${20 - n} more until it drops to 10%` : "You're on the lowest rate"} />
     </div>
 
     <div className="card mt-4">

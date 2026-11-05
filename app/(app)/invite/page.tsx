@@ -1,7 +1,7 @@
 import { requireMe } from "@/lib/me";
 import { myCredits } from "@/lib/queries";
 import { CopyLink } from "@/components/CopyLink";
-import { Meter, PageHeader, Stat } from "@/components/ui";
+import { PageHeader, Stat } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 
 const STEPS = [
@@ -31,9 +31,9 @@ export default async function Invite() {
     </div>
 
     <div className="cols cols-3 mt-4">
-      <Stat label="Free sessions earned" value={c.referral_credits_earned} suffix={`/ ${c.referral_credits_max}`} foot={<Meter value={c.referral_credits_earned} max={c.referral_credits_max} />} />
-      <Stat label="Friends still to finish" value={c.referrals_pending} foot="They count once they finish their first practice." />
-      <Stat label="Left to earn" value={left} foot={left === 0 ? "You've hit the maximum. Thank you!" : "Keep sharing to earn more."} />
+      <Stat icon="gift" label="Free sessions earned" value={c.referral_credits_earned} suffix={`/ ${c.referral_credits_max}`} meter={{ value: c.referral_credits_earned, max: c.referral_credits_max }} />
+      <Stat icon="users" label="Friends still to finish" value={c.referrals_pending} foot="They count once they finish their first practice." />
+      <Stat icon="sparkle" label="Left to earn" value={left} foot={left === 0 ? "You've hit the maximum. Thank you!" : "Keep sharing to earn more."} />
     </div>
 
     <section className="section">

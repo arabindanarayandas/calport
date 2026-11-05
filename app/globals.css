@@ -169,13 +169,49 @@ button { font: inherit; color: inherit; }
 .panel { background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; }
 @media (max-width: 480px) { .card-pad, .card-body { padding: 16px; } .card-head { padding: 14px 16px; } .card-foot { padding: 12px 16px; } }
 
-/* stat */
-.stat { display: flex; flex-direction: column; padding: 18px 20px; min-height: 128px; }
-.stat .t-num { margin-top: 8px; }
-.stat-foot { margin-top: auto; padding-top: 12px; font-size: 13px; line-height: 18px; color: var(--muted); }
-.stat-foot a { color: var(--fg); font-weight: 500; }
-.stat-foot a:hover { text-decoration: underline; text-underline-offset: 3px; }
-@media (max-width: 480px) { .stat { padding: 14px 16px; min-height: 112px; } .t-num { font-size: 24px; line-height: 30px; } }
+/* stat
+   Desktop: icon and arrow on top, then the number, label and footnote.
+   Phone: a compact row — icon, number with label, arrow — with the footnote underneath. */
+.stat {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto 1fr;
+  grid-template-areas: "icon go" "value value" "label label" "foot foot";
+  padding: 20px;
+}
+.stat-icon { grid-area: icon; margin-bottom: 16px; }
+.stat-go { grid-area: go; align-self: start; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 99px; color: var(--faint); transition: background-color .12s, color .12s; }
+.stat-value { grid-area: value; display: flex; align-items: baseline; height: 36px; font-size: 32px; line-height: 36px; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stat-suffix { font-size: 16px; line-height: 1; font-weight: 500; letter-spacing: 0; color: var(--faint); margin-left: 4px; }
+.stat-label { grid-area: label; margin-top: 6px; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--fg); }
+.stat-foot { grid-area: foot; align-self: end; margin-top: 16px; font-size: 13px; line-height: 18px; color: var(--muted); }
+.stat-link { transition: border-color .12s, box-shadow .12s; }
+.stat-link:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm); }
+.stat-link:hover .stat-go { background: var(--fg); color: var(--bg); }
+.icon-tile { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--bg-muted); color: var(--fg); }
+.icon-tile svg { width: 18px; height: 18px; }
+@media (max-width: 560px) {
+  .stat { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon value go" "icon label go" "foot foot foot"; column-gap: 14px; padding: 16px; }
+  .stat:not(:has(.stat-icon)) { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "value go" "label go" "foot foot"; }
+  .stat-icon { margin: 0; align-self: center; width: 44px; height: 44px; }
+  .stat-go { align-self: center; }
+  .stat-value { height: 28px; font-size: 24px; line-height: 28px; }
+  .stat-label { margin-top: 0; font-size: 13px; line-height: 18px; color: var(--muted); }
+  .stat-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .stat-foot:has(.meter) { margin-top: 12px; padding-top: 0; border-top: 0; }
+  .cols.cols-3:has(> .stat) { --cols: 1; gap: 10px; }
+  /* four numbers on a phone: a tidy 2 × 2 of just the number and label */
+  .cols.cols-4:has(> .stat) { --cols: 2; gap: 10px; }
+  .cols-4 > .stat { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "value go" "label label"; row-gap: 2px; }
+  .cols-4 > .stat .stat-icon, .cols-4 > .stat .stat-foot { display: none; }
+  .cols-4 > .stat .stat-go { align-self: start; margin: -4px -6px 0 0; }
+  .stat { grid-template-rows: none; }
+}
+
+/* date tile */
+.date-tile { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 48px; height: 52px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); box-shadow: var(--shadow-xs); }
+.date-tile .m { font-size: 11px; line-height: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.date-tile .d { font-size: 20px; line-height: 24px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.date-tile.dark { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.date-tile.dark .m { color: rgba(255, 255, 255, 0.6); }
 
 /* list */
 .list { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-xs); overflow: hidden; }
@@ -437,3 +473,32 @@ input[type="number"].input { font-variant-numeric: tabular-nums; }
 .show-sm { display: none; }
 @media (max-width: 760px) { .show-sm { display: inline; } .filters .hide-sm, .hide-sm { display: none; } }
 .chip { white-space: nowrap; }
+
+/* year card (home) */
+.year-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 32px; align-items: end; padding: 24px; border-radius: var(--r-lg); background: var(--fg); color: var(--bg); }
+.year-kicker { font-size: 12px; line-height: 16px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+.year-title { margin-top: 8px; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.02em; }
+.year-text { margin-top: 6px; font-size: 14px; line-height: 20px; color: rgba(255, 255, 255, 0.72); max-width: 420px; }
+.year-track { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.year-track li { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.year-track .bar { height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.16); margin-bottom: 8px; }
+.year-track .yr { font-size: 11px; line-height: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.4); }
+.year-track .nm { font-size: 13px; line-height: 18px; color: rgba(255, 255, 255, 0.5); }
+.year-track li.done .bar { background: rgba(255, 255, 255, 0.6); }
+.year-track li.done .nm { color: rgba(255, 255, 255, 0.7); }
+.year-track li.now .bar { background: #fff; }
+.year-track li.now .yr { color: rgba(255, 255, 255, 0.75); }
+.year-track li.now .nm { color: #fff; font-weight: 600; }
+@media (max-width: 860px) { .year-card { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 20px; } }
+@media (max-width: 480px) { .year-track .nm { font-size: 12px; line-height: 16px; } }
+
+/* next session (home) */
+.next-card { display: flex; align-items: center; gap: 16px; padding: 20px; }
+.next-main { display: flex; align-items: center; gap: 16px; flex: 1 1 auto; min-width: 0; }
+.next-title { margin-top: 2px; font-size: 16px; line-height: 22px; font-weight: 600; letter-spacing: -0.01em; }
+.next-action { flex-shrink: 0; }
+@media (max-width: 560px) { .next-card { flex-direction: column; align-items: stretch; gap: 16px; padding: 16px; } .next-action .btn { width: 100%; } .next-action .badge { width: 100%; justify-content: center; height: 30px; } }
+
+.row-link { transition: background-color .12s; }
+.row-link:hover { background: var(--bg-subtle); }
+.faint { color: var(--faint); }
