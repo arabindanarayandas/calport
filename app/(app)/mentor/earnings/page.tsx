@@ -1,7 +1,9 @@
 import { requireMe } from "@/lib/me";
 import { mySessions } from "@/lib/queries";
 import { inr, relDay, time } from "@/lib/format";
-import { Avatar, Empty, PageHeader, SectionHead, Stat } from "@/components/ui";
+import { Empty, PageHeader, Row, SectionHead, Stat, Table, Tag, Who } from "@/components/ui";
+
+const HCOLS: [string, string, string?][] = [["Student", "minmax(0,1.5fr)", "main"], ["Paid by", "150px"], ["Fee", "70px", "hide-m"], ["Status", "170px"], ["You get", "100px", "right"]];
 
 const TIERS = [["Paid sessions 1–10", 25, 0, 10], ["Paid sessions 11–20", 20, 10, 20], ["From then on", 10, 20, Infinity]] as const;
 
@@ -38,16 +40,14 @@ export default async function Earnings() {
 
     <section className="section">
       <SectionHead title="History" />
-      {paid.length ? <div className="list">{paid.slice().reverse().map((s) => (
-        <div key={s.id} className="list-row">
-          <Avatar name={s.other_name} />
-          <div className="list-main"><div className="title truncate">{s.other_name}</div>
-            <div className="sub truncate">{relDay(s.starts_at)}, {time(s.starts_at)} · {s.kind === "credit" ? "Paid by Calport" : "Paid by student"} · {s.commission_pct}% fee</div></div>
-          <div className="when-col">
-            <span className="t-num-sm">{inr(s.mentor_payout_inr)}</span>
-            <span className="t-small muted">{s.status !== "confirmed" ? "Earned" : new Date(s.starts_at) > new Date() ? "Upcoming" : "Awaiting scorecard"}</span>
-          </div>
-        </div>))}</div>
+      {paid.length ? <Table cols={HCOLS}>{paid.slice().reverse().map((s) => (
+        <Row key={s.id} cols={HCOLS} cells={[
+          <Who key="w" name={s.other_name} sub={`${relDay(s.starts_at)}, ${time(s.starts_at)}`} />,
+          s.kind === "credit" ? <Tag key="k" tone="blue">Paid by Calport</Tag> : <Tag key="k" tone="purple">Paid by student</Tag>,
+          <span key="f" className="tabular muted">{s.commission_pct}%</span>,
+          s.status !== "confirmed" ? <Tag key="st" tone="green">Earned</Tag> : new Date(s.starts_at) > new Date() ? <Tag key="st" tone="grey">Upcoming</Tag> : <Tag key="st" tone="yellow">Awaiting scorecard</Tag>,
+          <span key="a" className="t-num-sm">{inr(s.mentor_payout_inr)}</span>,
+        ]} />))}</Table>
         : <Empty icon="wallet" title="No paid sessions yet" text="Your first 2 sessions are free. Paid sessions will appear here." />}
     </section>
   </>);

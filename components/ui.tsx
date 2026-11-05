@@ -31,9 +31,54 @@ export function Alert({ error, ok, info }: { error?: string | null; ok?: string 
   );
 }
 
+const PASTELS = ["p-blue", "p-green", "p-yellow", "p-purple", "p-peach", "p-pink", "p-teal"];
+/** Picks the same soft colour for the same text every time. */
+export function pastelFor(text: string) {
+  let h = 0;
+  for (const c of text) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return PASTELS[h % PASTELS.length];
+}
+
 export function Avatar({ name, size = 36, dark }: { name: string; size?: number; dark?: boolean }) {
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
-  return <span className={`avatar${dark ? " dark" : ""}`} style={{ "--s": `${size}px` } as React.CSSProperties} aria-hidden="true">{initials}</span>;
+  return <span className={`avatar ${dark ? "dark" : pastelFor(name)}`} style={{ "--s": `${size}px` } as React.CSSProperties} aria-hidden="true">{initials}</span>;
+}
+
+/** Soft coloured label, as in the reference design. */
+export function Tag({ children, tone = "grey" }: { children: React.ReactNode; tone?: "grey" | "blue" | "green" | "yellow" | "purple" | "peach" | "pink" | "teal" }) {
+  return <span className={`tag p-${tone}`}>{children}</span>;
+}
+
+/** Table with a soft header row. cols: [label, CSS width, class]; children are <Row>s. */
+export function Table({ cols, children, empty }: { cols: [string, string, string?][]; children?: React.ReactNode; empty?: React.ReactNode }) {
+  const has = Array.isArray(children) ? children.filter(Boolean).length > 0 : Boolean(children);
+  return (
+    <div className="dt" style={{ "--cols": cols.map((c) => c[1]).join(" ") } as React.CSSProperties}>
+      <div className="dt-h">{cols.map(([label, , cls], i) => <div key={i} className={cls}>{label}</div>)}</div>
+      {has ? children : <div className="dt-empty">{empty ?? "Nothing here yet."}</div>}
+    </div>
+  );
+}
+export function Row({ cells, cols, sub, mine }: { cells: React.ReactNode[]; cols: [string, string, string?][]; sub?: React.ReactNode; mine?: boolean }) {
+  return (
+    <div className={`dt-r${mine ? " mine" : ""}`}>
+      {cells.map((c, i) => <div key={i} className={cols[i]?.[2]}>{c}</div>)}
+      {sub && <div className="dt-sub">{sub}</div>}
+    </div>
+  );
+}
+export function Who({ name, sub, href }: { name: string; sub?: React.ReactNode; href?: string }) {
+  const inner = (<><Avatar name={name} size={32} /><span style={{ minWidth: 0 }}><b className="truncate" style={{ display: "block" }}>{name}</b>{sub && <small className="truncate" style={{ display: "block" }}>{sub}</small>}</span></>);
+  return href ? <Link href={href} className="dt-who">{inner}</Link> : <div className="dt-who">{inner}</div>;
+}
+
+/** Tabs that are plain links, so the page stays server-rendered. */
+export function Tabs({ items }: { items: { href: string; label: string; count?: number | string; on: boolean }[] }) {
+  return (
+    <nav className="tabs-soft" aria-label="Filter">
+      {items.map((t) => <Link key={t.href} href={t.href} className={t.on ? "on" : ""} aria-current={t.on ? "page" : undefined}>{t.label}{t.count !== undefined && <span className="n">{t.count}</span>}</Link>)}
+    </nav>
+  );
 }
 
 export function Empty({ icon, title, text, action }: { icon: IconName; title: string; text?: React.ReactNode; action?: { href: string; label: string } }) {
@@ -76,16 +121,16 @@ export function DateTile({ iso, dark }: { iso: string; dark?: boolean }) {
   );
 }
 
-const STATUS: Record<string, [string, string]> = {
-  confirmed: ["Confirmed", "ok"],
-  completed: ["Completed", ""],
-  cancelled: ["Cancelled", "outline"],
-  no_show: ["Missed", "bad"],
-  awaiting_payment: ["Awaiting payment", "warn"],
+const STATUS: Record<string, [string, "blue" | "green" | "grey" | "pink" | "yellow"]> = {
+  confirmed: ["Confirmed", "blue"],
+  completed: ["Completed", "green"],
+  cancelled: ["Cancelled", "grey"],
+  no_show: ["Missed", "pink"],
+  awaiting_payment: ["Awaiting payment", "yellow"],
 };
 export function StatusBadge({ status }: { status: string }) {
-  const [label, cls] = STATUS[status] ?? [status, ""];
-  return <span className={`badge ${cls}`}>{cls === "ok" || cls === "warn" || cls === "bad" ? <span className="dot" /> : null}{label}</span>;
+  const [label, tone] = STATUS[status] ?? [status, "grey"];
+  return <Tag tone={tone}>{label}</Tag>;
 }
 
 export function Meter({ value, max }: { value: number; max: number }) {

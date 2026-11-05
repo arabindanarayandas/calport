@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requireMe } from "@/lib/me";
 import { myCredits, type MentorCard } from "@/lib/queries";
 import { dayKey, inr, message, relDay, time } from "@/lib/format";
-import { Alert, Avatar } from "@/components/ui";
+import { Alert, Avatar, Tag } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 import { bookSlot } from "../../actions";
 
@@ -39,7 +39,7 @@ export default async function MentorPage({ params, searchParams }: { params: Pro
     <header className="row g-4" style={{ marginBottom: 32 }}>
       <Avatar name={m.full_name} size={56} />
       <div className="grow">
-        <div className="row wrap g-2"><h1 className="t-title">{m.full_name}</h1><span className="badge outline">{m.tier === "senior" ? "Placed senior" : "Professional"}</span></div>
+        <div className="row wrap g-2"><h1 className="t-title">{m.full_name}</h1>{m.tier === "senior" ? <Tag tone="green">Placed senior</Tag> : <Tag tone="purple">Professional</Tag>}</div>
         <p className="muted mt-1">{[m.job_title, m.company].filter(Boolean).join(" at ")}{m.college ? ` · ${m.college}` : ""}</p>
       </div>
     </header>
@@ -51,7 +51,7 @@ export default async function MentorPage({ params, searchParams }: { params: Pro
           <h2 className="t-section">About</h2>
           <p className="mt-3">{m.headline}</p>
           {m.bio && <p className="fg-2 pre mt-3" style={{ lineHeight: "22px" }}>{m.bio}</p>}
-          {m.expertise?.length > 0 && <div className="tags mt-4">{m.expertise.map((e) => <span key={e} className="badge outline">{e}</span>)}</div>}
+          {m.expertise?.length > 0 && <div className="tags mt-4">{m.expertise.map((e) => <span key={e} className="chip-soft">{e}</span>)}</div>}
           {m.linkedin_url && <a href={m.linkedin_url} target="_blank" rel="noreferrer" className="btn secondary sm mt-4" style={{ alignSelf: "flex-start" }}><Icon name="linkedin" />LinkedIn<Icon name="external" /></a>}
         </div>
         <div className="trio">
